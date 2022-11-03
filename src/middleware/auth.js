@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = process.env;
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
 	const token = req.body.token || req.query.token || req.headers['x-access-token'];
 
 	if(!token) {
@@ -19,4 +19,17 @@ function verifyToken(req, res, next) {
 	return next();
 }
 
-module.exports = verifyToken;
+const verifyUser = role => (req, res, next) => {
+	const user = req.user;
+
+	if(role !== user.role) {
+		return res.status(403).send('No tienes permisos para acceder a esta página');
+	}
+
+	next();
+}
+
+module.exports = {
+	verifyToken,
+	verifyUser
+};

@@ -3,10 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const authRoutes = require('./routes/auth.js');
+const errorHandler = require('./middleware/errorHandler.js');
 
 const app = express();
 const port = '5001';
+
+const mysqlConnector = require('./database/mysql.connector.js');
+
+mysqlConnector.init();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,9 +20,11 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.use('/api', authRoutes);
+app.use(errorHandler);
 
+app.use('/api/v1/auth', require('./routes/auth.route.js'));
+app.use('/api/v1', require('./routes/product.route.js'));
 
 app.listen(port, function() {
-	console.log(`Server started on port ${port}. Press CTRL-C to exit`);
+	console.log(`Info: Servidor iniciado en el puerto ${port}.`);
 });
